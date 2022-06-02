@@ -54,11 +54,11 @@ const followingUserController = asyncHandler(async (req, res) => {
     }, {new: true});
 
     //! Теперь кладем ID пользователя на которого я подписался в свое свойство following
-    await User.findByIdAndUpdate(loginUserId, {
+    const followedUser = await User.findByIdAndUpdate(loginUserId, {
         $push: {following: followId}
     }, {new: true});
 
-    res.json('Вы подписались')
+    res.json(followedUser)
 });
 
 //* --------------------------------------------------------
@@ -81,11 +81,11 @@ const unFollowController = asyncHandler(async (req, res) => {
     }, {new: true});
 
     //! И также удаляем ID пользователя от которого хотим отписаться из моего массива подписчиков
-    await User.findByIdAndUpdate(loginUserId, {
+    const unFollowed =  await User.findByIdAndUpdate(loginUserId, {
         $pull: {following: unFollowId}
     }, {new: true});
 
-    res.json('Вы отписались')
+    res.json(unFollowed)
 });
 
 //* ---------------------------------

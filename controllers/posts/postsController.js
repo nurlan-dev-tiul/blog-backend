@@ -24,7 +24,6 @@ const createPostController = asyncHandler(async (req, res) => {
     try {
         const post = await Post.create({...req.body, user: _id, image: imgUpload.url});
         res.json(post);
-        console.log(post);
 
         //! После загрузки на cloudinary очищаем папку images/posts
         // fs.unlinkSync(localPath);
@@ -34,26 +33,42 @@ const createPostController = asyncHandler(async (req, res) => {
 });
 
 //*=============================================================
-//* Отправляем все статьи или статьи по конкретной категории = Controller
+//* Отправляем все статьи = Controller
 //*=============================================================
 const getPostsController = asyncHandler(async(req, res) => {
 
-    //! Здесь мы получаем название категории
-    const hasCategory = req.query.category;
-
+    const {page} = req.query;
+    const options = {
+        page: Number(page),
+        limit: 3,
+        populate: 'category',
+        sort: '-createdAt'
+    };
     try {
-        //! Если в req.query.catgeory есть название категории то отправляй только те статьи
-        //! свойство category котороая соответствует req.query.catgeory
-        if(hasCategory) { 
-            const posts = await Post.find({category: hasCategory})
-            .sort('-createdAt').populate('comments').populate('user', 'firstName')
-            res.json(posts);
-        }else{
-            const posts = await Post.find({}).sort('-createdAt').populate('comments').populate('user');
-            res.json(posts);
-        }
-        
-        
+        const posts = await Post.paginate({}, options)
+        res.json(posts)
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+//*=============================================================
+//* Статьи по конкретной категории = Controller
+//*=============================================================
+const postByCategoryController = asyncHandler(async(req, res) => {
+
+    const { id } = req?.params;
+    const {page} = req?.query;
+
+    const options = {
+        page: Number(page),
+        limit: 3,
+        populate: 'category',
+        sort: '-createdAt'
+    };
+    try {
+        const posts = await Post.paginate({category: id}, options)
+        res.json(posts)
     } catch (error) {
         res.json(error);
     }
@@ -165,4 +180,5 @@ module.exports = {
     updatePostController,
     deletePostController,
     addLikeToPostController,
+    postByCategoryController
 }

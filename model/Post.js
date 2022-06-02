@@ -1,4 +1,6 @@
+const mongoosePaginate = require('mongoose-paginate-v2');
 const mongoose = require('mongoose');
+
 
 const postSchema = new mongoose.Schema({
     title: {
@@ -7,8 +9,8 @@ const postSchema = new mongoose.Schema({
         trim: true
     },
     category: {
-        type: String,
-        required: [true, 'Поле категории - обьязательно'],
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Category',
     },
     //! Просмотры
     numViews: {
@@ -52,6 +54,7 @@ const postSchema = new mongoose.Schema({
 });
 
 
+
 //! Виртуальные поля для комментариев
 postSchema.virtual('comments', {
 
@@ -60,7 +63,17 @@ postSchema.virtual('comments', {
     ref: 'Comment', //! Ссылка на модель Comment
     foreignField: 'post', //! Ссылка на свойство post в модели Comment, там лежит id статьи
     localField: '_id'
-})
+});
+
+postSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'user',
+    })
+    next();
+});
+
+//! Pagination
+postSchema.plugin(mongoosePaginate);
 
 const Post = mongoose.model('Post', postSchema);
 module.exports = Post;

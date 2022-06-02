@@ -80,12 +80,6 @@ const userSchema = new mongoose.Schema({
         default: false
     }
 }, {
-    toJSON: {
-        virtuals: true
-    },
-    toObject: {
-        virtuals: true
-    },
     timestamps: true
 });
 
@@ -95,6 +89,9 @@ userSchema.virtual('posts', {
     foreignField: 'user', //! Ссылка на свойство user в модели Post, там лежит id пользователя
     localField: '_id',
 });
+
+userSchema.set('toObject', { virtuals: true });
+userSchema.set('toJSON', { virtuals: true });
 
 //* ================ Hash Password При регистрации
 userSchema.pre('save', async function(next){
