@@ -14,8 +14,6 @@ const createPostController = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     //! Проверяем валидный ли id у пользователя
     // validateMongoDbId(req.body.user);
-    console.log(req);
-
     //! Находим картинки которые мы положили в папку images
     const localPath = `public/images/posts/${req.file.filename}`;
 
@@ -106,20 +104,46 @@ const getSinglePostController = asyncHandler(async (req, res) => {
 const updatePostController = asyncHandler(async (req, res) => {
     //! Получаем id статьи из параметров url
     const { id } = req.params;
-
-    //! Проверяем валидный ли id есть ли статья с таким id
-    validateMongoDbId(id);
+    console.log(id);
+    console.log(req.body);
     try {
         const post = await Post.findByIdAndUpdate(id, {
-            ...req.body, 
+            title: req.body.title,
+            description: req.body.description,
+            category: req.body.category,
             user: req.user._id
         }, {new: true});
 
         res.json(post);
+
     } catch (error) {
         res.json(error)
     }
     
+});
+
+//* ---------------------------------
+//* Profile photo upload 
+//* ---------------------------------
+const updateImagePostController = asyncHandler(async (req, res) => {
+    //! Берем пользователя из токена
+    const { id } = req.params;
+    console.log(req.file);
+    //! Находим картинки которые мы положили в папку images
+    const localPath = `public/images/posts/${req.file.filename}`;
+
+    //! Загружаем эту картинку в cloudinary, и путь к этой картинке у нас лежит в imgUpload
+    const imgUpload = await cloudinaryUploadImg(localPath)
+
+    //! Ищем пользователя из токена и обновляем ему свойство Post Image
+    const post = await Post.findByIdAndUpdate(id, {
+        image: imgUpload.url //! Теперь у нас в профиле будет путь к картинке из cloudinary
+    }, {new: true});
+
+
+    //! Удаляем картинки из папки images/profile после того как загрузили на cloudinary
+    fs.unlinkSync(localPath);
+    res.json(post.image);
 });
 
 //*=============================================================
@@ -132,8 +156,8 @@ const deletePostController = asyncHandler(async (req, res) => {
     //! Проверяем валидный ли id есть ли статья с таким id
     validateMongoDbId(id);
     try {
-        await Post.findByIdAndDelete(id);
-        res.json('Статья была удалена');
+        const post = await Post.findByIdAndDelete(id);
+        res.json(post._id);
     } catch (error) {
         res.json(error)
     }
@@ -180,5 +204,6 @@ module.exports = {
     updatePostController,
     deletePostController,
     addLikeToPostController,
-    postByCategoryController
+    postByCategoryController,
+    updateImagePostController
 }

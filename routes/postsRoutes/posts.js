@@ -7,6 +7,7 @@ const {
     deletePostController,
     addLikeToPostController,
     postByCategoryController,
+    updateImagePostController
 } = require('../../controllers/posts/postsController');
 const authMiddlware = require('../../middlware/auth/authMiddlware');
 const { photoUpload, postPhotoResizing } = require('../../middlware/upload/photoUpload');
@@ -21,10 +22,23 @@ postRoutes.post(
     createPostController
 );
 
+postRoutes.put(
+    '/update-image/:id', 
+    authMiddlware,
+    photoUpload.single('image'),
+    postPhotoResizing,
+    updateImagePostController
+);
+
+postRoutes.put(
+    '/update/:id', 
+    authMiddlware,
+    updatePostController
+);
+
+
 //* Likes Route
 postRoutes.put('/likes', authMiddlware, addLikeToPostController);
-
-postRoutes.put('/update/:id', authMiddlware, updatePostController);
 postRoutes.delete('/delete/:id', authMiddlware, deletePostController);
 postRoutes.get('/category/:id', postByCategoryController);
 postRoutes.get('/', getPostsController);

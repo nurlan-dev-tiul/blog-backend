@@ -25,68 +25,6 @@ const detailUserController = asyncHandler(async (req, res) => {
     }
 });
 
-//* --------------------------------------------------------
-//* Подписка на кого либо, и мои подписчики
-//* --------------------------------------------------------
-const followingUserController = asyncHandler(async (req, res) => {
-
-    //! Получаем ID пользователя на которого хотим подписаться
-    const { followId } = req.body;
-
-    //! Получаем свое ID из токена
-    const loginUserId = req.user.id;
-
-    //! Чтобы на меня один и тот же нескольо раз не подписался или я на кого то много раз не подписался, дубликаты
-    //! Сначала находим пользователя на которого хотим подписаться
-    const checkUser = await User.findById(followId);
-
-    //! Теперь сравниваем если у пользователя checkUser в массиве followers есть мой id, сообщение = мы уже подписаны
-    const alreadyFolowing = checkUser?.followers?.find(user => user?.toString() === loginUserId.toString());
-    if(alreadyFolowing) throw new Error('Вы уже подписаны на этого пользователя')
-
-    //! Находим пользователя на которого хотим подписаться и кладем наше ID в его свойство followers
-    await User.findByIdAndUpdate(followId, {
-        //! Тут мы пушим в массив followers наш ID
-        $push: {followers: loginUserId},
-        //! Свойство isFollowing из БД(Модель User) делаем true, 
-        //! типа подписаны, и на клиенте мы можем уже через это свойство манипулировать рендером
-        isFollowing: true
-    }, {new: true});
-
-    //! Теперь кладем ID пользователя на которого я подписался в свое свойство following
-    const followedUser = await User.findByIdAndUpdate(loginUserId, {
-        $push: {following: followId}
-    }, {new: true});
-
-    res.json(followedUser)
-});
-
-//* --------------------------------------------------------
-//* Отписка
-//* --------------------------------------------------------
-const unFollowController = asyncHandler(async (req, res) => {
-    //! Получаем с клиента ID пользователя от которого хотим отписаться
-    const { unFollowId } = req.body;
-
-    //! Получаем свое ID из токена
-    const loginUserId = req.user.id;
-
-    const checkUser = await User.findById(unFollowId);
-
-    //!Находим пользователя в БД от которого хотим отписаться 
-    //! И в его массиве followers удаляем наш ID
-    await User.findByIdAndUpdate(unFollowId, {
-        $pull: {followers: loginUserId},
-        isFollowing: false //! Свойство из Модели User isFollowing делаем false
-    }, {new: true});
-
-    //! И также удаляем ID пользователя от которого хотим отписаться из моего массива подписчиков
-    const unFollowed =  await User.findByIdAndUpdate(loginUserId, {
-        $pull: {following: unFollowId}
-    }, {new: true});
-
-    res.json(unFollowed)
-});
 
 //* ---------------------------------
 //* Update Profile Logic 
@@ -131,8 +69,6 @@ const uploadProfilePhotoController = asyncHandler(async (req, res) => {
 
 module.exports = {
     detailUserController,
-    followingUserController,
-    unFollowController,
     updateProfileController,
     uploadProfilePhotoController
 }
