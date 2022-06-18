@@ -10,7 +10,7 @@ const validateMongoDbId = require('../../utils/validateId');
 const userRegisterController = asyncHandler(async (req, res) => {
     //! Проверка пользователя существует ли такой
     const userExists = await User.findOne({email: req.body.email});
-    console.log(req.body);
+
     if(userExists) {
         throw new Error('Пользователь с таким Email уже существует')
     }

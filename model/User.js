@@ -7,9 +7,6 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Имя обьязательно'],
         type: String,
     },
-    lastName: {
-        type: String,
-    },
     profilePhoto: {
         type: String,
         default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
@@ -22,14 +19,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Пароль обьязательно'],
     },
-    postCount: {
-        type: Number,
-        default: 0,
-    },
-    isBlocked: {
-        type: Boolean,
-        default: false,
-    },
     isAdmin: {
         type: Boolean,
         default: false
@@ -37,14 +26,6 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['Admin', 'Guest', 'Blogger'],
-    },
-    isFollowing: {
-        type: Boolean,
-        default: false,
-    },
-    isUnFollowing: {
-        type: Boolean,
-        default: false,
     },
 
     //! Какие пользователи просмотрели, ссылаемся на User
@@ -56,29 +37,6 @@ const userSchema = new mongoose.Schema({
             }
         ]
     },
-    //! Список подписчиков, также тут будут храниться Id пользователей которые подписаны
-    followers: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User'
-            }
-        ]
-    },
-    //! Также тут будут храниться Id пользователей на которых подписан я
-    following: {
-        type: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User'
-            }
-        ]
-    },
-    
-    active: {
-        type: Boolean,
-        default: false
-    }
 }, {
     timestamps: true
 });

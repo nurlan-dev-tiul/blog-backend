@@ -24,7 +24,7 @@ const createPostController = asyncHandler(async (req, res) => {
         res.json(post);
 
         //! После загрузки на cloudinary очищаем папку images/posts
-        // fs.unlinkSync(localPath);
+        fs.unlinkSync(localPath);
     } catch (error) {
         res.json(error)
     }
@@ -73,6 +73,19 @@ const postByCategoryController = asyncHandler(async(req, res) => {
 });
 
 //*=============================================================
+//* Популярные статьи = Controller
+//*=============================================================
+const getPopularPostsController = asyncHandler(async(req, res) => {
+
+    try {
+        const posts = await Post.find({}).sort({'numViews': -1}).limit(5).populate('category')
+        res.json(posts)
+    } catch (error) {
+        res.json(error);
+    }
+});
+
+//*=============================================================
 //* Получаем одну конкретную статью, добавляем просмотры = Controller
 //*=============================================================
 const getSinglePostController = asyncHandler(async (req, res) => {
@@ -104,8 +117,7 @@ const getSinglePostController = asyncHandler(async (req, res) => {
 const updatePostController = asyncHandler(async (req, res) => {
     //! Получаем id статьи из параметров url
     const { id } = req.params;
-    console.log(id);
-    console.log(req.body);
+
     try {
         const post = await Post.findByIdAndUpdate(id, {
             title: req.body.title,
@@ -128,7 +140,7 @@ const updatePostController = asyncHandler(async (req, res) => {
 const updateImagePostController = asyncHandler(async (req, res) => {
     //! Берем пользователя из токена
     const { id } = req.params;
-    console.log(req.file);
+    
     //! Находим картинки которые мы положили в папку images
     const localPath = `public/images/posts/${req.file.filename}`;
 
@@ -200,6 +212,7 @@ const addLikeToPostController = asyncHandler(async(req, res) => {
 module.exports = {
     createPostController,
     getPostsController,
+    getPopularPostsController,
     getSinglePostController,
     updatePostController,
     deletePostController,

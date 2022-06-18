@@ -34,6 +34,10 @@ app.use('/api/posts', postRoutes);
 //! Comments Route 
 app.use('/api/comments', commentRoutes);
 
+app.get('/', (req, res) => {
+    res.send('Сервер запустился')
+})
+
 //! Not Found Error = ошибка на неправильный URL адрес Route REST API
 app.use(notFoundError);
 

@@ -50,7 +50,7 @@ const postPhotoResizing = async (req, res, next) => {
     req.file.filename = `post-${Date.now()}-${req.file.originalname}`;
 
     await sharp(req.file.buffer)
-        .resize(500, 500) //! width, height 
+        .resize(950, 950) //! width, height 
         .toFormat('jpeg') //! изменяем формат на jpeg
         .jpeg({quality: 90}) //! Качество 90
         .toFile(path.join(`public/images/posts/${req.file.filename}`));

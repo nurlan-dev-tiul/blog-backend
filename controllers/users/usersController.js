@@ -1,9 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const fs = require('fs');
 const User = require('../../model/User');
-const generateToken = require('../../config/token/generateToken');
 const validateMongoDbId = require('../../utils/validateId');
-const { populate } = require('../../model/User');
 const cloudinaryUploadImg = require('../../utils/cloudinary');
 
 //* ---------------------------------
@@ -17,8 +15,6 @@ const detailUserController = asyncHandler(async (req, res) => {
     try {
         const user = await User.findById(id)
             .populate('posts')
-            .populate('followers')
-            .populate('following');
         res.json(user)
     } catch (error) {
         res.json(error)
@@ -49,7 +45,7 @@ const updateProfileController = asyncHandler(async (req, res) => {
 const uploadProfilePhotoController = asyncHandler(async (req, res) => {
     //! Берем пользователя из токена
     const { _id } = req.user;
-    console.log(req.file);
+
     //! Находим картинки которые мы положили в папку images
     const localPath = `public/images/profile/${req.file.filename}`;
 
