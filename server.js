@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use((req, res, next) => {
-    if(req.rawBody === undefined && req.method === 'POST' && req.headers['content-type'].startsWith('multipart/form-data')){
+    if(req.rawBody === undefined && req.method === 'PUT' && req.headers['content-type'].startsWith('image')){
         getRawBody(req, {
             length: req.headers['content-length'],
             limit: '10mb',
