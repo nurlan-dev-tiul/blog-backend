@@ -16,6 +16,23 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use((req, res, next) => {
+    if(req.rawBody === undefined && req.method === 'POST' && req.headers['content-type'].startsWith('multipart/form-data')){
+        getRawBody(req, {
+            length: req.headers['content-length'],
+            limit: '10mb',
+            encoding: contentType.parse(req).parameters.charset
+        }, function(err, string){
+            if (err) return next(err)
+            req.rawBody = string
+            next()
+        })
+    } else {
+        next()
+    }
+})
+
+
 
 //! Mongo DB Connection
 dbConnect();
