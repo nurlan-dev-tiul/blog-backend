@@ -24,7 +24,7 @@ postRoutes.post(
 );
 
 postRoutes.put(
-    '/update-image/:id', 
+    '/image/:id', 
     authMiddlware,
     photoUpload.single('image'),
     postPhotoResizing,

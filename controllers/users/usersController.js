@@ -60,7 +60,7 @@ const uploadProfilePhotoController = asyncHandler(async (req, res) => {
 
     //! Удаляем картинки из папки images/profile после того как загрузили на cloudinary
     fs.unlinkSync(localPath);
-    res.status(200).json(user);
+    res.status(200).json(user.profilePhoto);
 });
 
 module.exports = {

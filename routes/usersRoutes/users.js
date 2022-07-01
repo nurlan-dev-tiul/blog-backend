@@ -12,7 +12,7 @@ const userRoutes = express.Router();
 // userRoutes.delete('/:id', deleteUserController);
 userRoutes.get('/:id', detailUserController);
 userRoutes.put(
-    '/profile-photo-upload', 
+    '/upload', 
     authMiddlware, 
     photoUpload.single('image'), 
     profilePhotoResizing,
