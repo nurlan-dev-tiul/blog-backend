@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
+const http = require("http");
 const cors = require('cors');
 const dbConnect = require('./config/db/dbConnect');
 const errorHandler = require('./middlware/error/errorHandler');
@@ -44,9 +45,11 @@ app.use(notFoundError);
 //! Error Handler = обработчик ошибок middlware
 app.use(errorHandler);
 
+const server = http.createServer(app);
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('Server run 5000');
 });
 
