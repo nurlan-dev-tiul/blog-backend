@@ -16,7 +16,8 @@ userRoutes.put(
     authMiddlware, 
     photoUpload.single('image'), 
     profilePhotoResizing,
-    uploadProfilePhotoController
+    uploadProfilePhotoController,
+    
 );
 userRoutes.put('/edit', authMiddlware, updateProfileController);
 

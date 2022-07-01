@@ -50,7 +50,11 @@ const uploadProfilePhotoController = asyncHandler(async (req, res) => {
     const localPath = `public/images/profile/${req.file.filename}`;
 
     //! Загружаем эту картинку в cloudinary, и путь к этой картинке у нас лежит в imgUpload
-    const imgUpload = await cloudinaryUploadImg(localPath)
+    const imgUpload = await cloudinaryUploadImg(localPath);
+    res.set({
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'
+    });
 
     //! Ищем пользователя из токена и обновляем ему свойство ptofilePhoto
     const user = await User.findByIdAndUpdate(_id, {
@@ -60,7 +64,7 @@ const uploadProfilePhotoController = asyncHandler(async (req, res) => {
 
     //! Удаляем картинки из папки images/profile после того как загрузили на cloudinary
     fs.unlinkSync(localPath);
-    res.status(200).json(user.profilePhoto);
+    res.json(user);
 });
 
 module.exports = {
