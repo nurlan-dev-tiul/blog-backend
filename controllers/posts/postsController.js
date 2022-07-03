@@ -12,19 +12,10 @@ const cloudinaryUploadImg = require('../../utils/cloudinary');
 const createPostController = asyncHandler(async (req, res) => {
     //! Получаем id из токена
     const { _id } = req.user;
-    //! Проверяем валидный ли id у пользователя
-    // validateMongoDbId(req.body.user);
-    //! Находим картинки которые мы положили в папку images
-    const localPath = `public/images/posts/${req.file.filename}`;
-
-    //! Загружаем эту картинку в cloudinary, и URL к этой картинке у нас лежит в imgUpload
-    const imgUpload = await cloudinaryUploadImg(localPath);
     try {
-        const post = await Post.create({...req.body, user: _id, image: imgUpload.url});
+        const post = await Post.create({...req.body, user: _id});
         res.json(post);
 
-        //! После загрузки на cloudinary очищаем папку images/posts
-        fs.unlinkSync(localPath);
     } catch (error) {
         res.json(error)
     }
@@ -135,26 +126,17 @@ const updatePostController = asyncHandler(async (req, res) => {
 });
 
 //* ---------------------------------
-//* Profile photo upload 
+//* Update картинки статьи
 //* ---------------------------------
 const updateImagePostController = asyncHandler(async (req, res) => {
     //! Берем пользователя из токена
     const { id } = req.params;
-    
-    //! Находим картинки которые мы положили в папку images
-    const localPath = `public/images/posts/${req.file.filename}`;
-
-    //! Загружаем эту картинку в cloudinary, и путь к этой картинке у нас лежит в imgUpload
-    const imgUpload = await cloudinaryUploadImg(localPath)
 
     //! Ищем пользователя из токена и обновляем ему свойство Post Image
     const post = await Post.findByIdAndUpdate(id, {
-        image: imgUpload.url //! Теперь у нас в профиле будет путь к картинке из cloudinary
+        image: req.body?.image
     }, {new: true});
 
-
-    //! Удаляем картинки из папки images/profile после того как загрузили на cloudinary
-    fs.unlinkSync(localPath);
     res.json(post.image);
 });
 
