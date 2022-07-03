@@ -1,8 +1,18 @@
 const asyncHandler = require('express-async-handler');
+const cloudinary = require('cloudinary');
 const fs = require('fs');
 const User = require('../../model/User');
 const validateMongoDbId = require('../../utils/validateId');
 const cloudinaryUploadImg = require('../../utils/cloudinary');
+
+
+//! Подключаемся к сервису
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 
 //* ---------------------------------
 //* Detail User Logic
@@ -45,27 +55,15 @@ const updateProfileController = asyncHandler(async (req, res) => {
 const uploadProfilePhotoController = asyncHandler(async (req, res) => {
     //! Берем пользователя из токена
     const { _id } = req.user;
-
-    //! Находим картинки которые мы положили в папку images
-    const localPath = `public/images/profile/${req.file.filename}`;
-
-    //! Загружаем эту картинку в cloudinary, и путь к этой картинке у нас лежит в imgUpload
-    const imgUpload = await cloudinaryUploadImg(localPath);
-    res.set({
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS'
-    });
-
+    
     //! Ищем пользователя из токена и обновляем ему свойство ptofilePhoto
     const user = await User.findByIdAndUpdate(_id, {
-        profilePhoto: imgUpload.url //! Теперь у нас в профиле будет путь к картинке из cloudinary
+        profilePhoto: req.body?.profilePhoto 
     }, {new: true});
 
-
-    //! Удаляем картинки из папки images/profile после того как загрузили на cloudinary
-    fs.unlinkSync(localPath);
-    res.json(user);
+    res.json(user.profilePhoto);
 });
+
 
 module.exports = {
     detailUserController,

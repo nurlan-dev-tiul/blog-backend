@@ -45,11 +45,11 @@ app.use(notFoundError);
 //! Error Handler = обработчик ошибок middlware
 app.use(errorHandler);
 
-const server = http.createServer(app);
+// const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log('Server run 5000');
 });
 
